@@ -6,9 +6,9 @@ import json
 def get_furries():
 
     # Get secrets
-    with open('./secrets/secret.json') as file_object:
+    with open('./server/secrets/secret.json') as file_object:
         secrets = json.load(file_object)
-        
+
     #Log into bsky as me
     client = Client()
     client.login(secrets["Username"], secrets["Password"])
@@ -24,25 +24,24 @@ def get_furries():
     
     #Add only handles to the list
     for f in follows.follows:
-        followsList.append(f.handle)
+        followsList.append(f.did)
 
     followsCursor = follows.cursor
 
     #Using cursor, get the rest of the followers handles
-    while len(followsList) <= followsCount:
+    while followsCursor != None:
         follows = client.bsky.graph.get_follows({'actor' : actor, 'cursor' : followsCursor, 'limit' : 100})
         #followsList.append(follows.follows)
         followsCursor = follows.cursor
-
         for f in follows.follows:
-            followsList.append(f.handle)
+            followsList.append(f.did)
 
         #print(str(len(followsList)) + "/" + str(followsCount))
 
     return followsList
 
 def write_furry_file(furryList):
-    with open('furries.txt', 'w') as f:
+    with open('./server/furries.txt', 'w') as f:
         f.write('\n'.join(furryList))
 
 # FOR DEBUG PURPOSE ONLY
