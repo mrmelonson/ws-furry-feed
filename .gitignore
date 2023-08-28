@@ -167,3 +167,5 @@ cython_debug/
 server/secrets/secret.json
 publish_feed.py
 server/furries.txt
+server/id,uri,cid,reply_parent,reply_root,index
+publish_feed.py
