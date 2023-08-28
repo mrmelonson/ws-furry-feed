@@ -17,7 +17,9 @@ class Post(BaseModel):
     reply_parent = peewee.CharField(null=True, default=None)
     reply_root = peewee.CharField(null=True, default=None)
     indexed_at = peewee.DateTimeField(default=datetime.now)
-
+    likes = peewee.IntegerField()
+    image = peewee.BooleanField()
+    reposts = peewee.BooleanField()
 
 class SubscriptionState(BaseModel):
     service = peewee.CharField(unique=True)
