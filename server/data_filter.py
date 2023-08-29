@@ -73,7 +73,7 @@ def operations_callback(ops: dict) -> None:
     posts_to_delete = [p['uri'] for p in ops['posts']['deleted']]
     if posts_to_delete:
         Post.delete().where(Post.uri.in_(posts_to_delete))
-        logger.info(f'Deleted from feed: {len(posts_to_delete)}')
+        #logger.info(f'Deleted from feed: {len(posts_to_delete)}')
 
     if posts_to_create:
         with db.atomic():
@@ -86,7 +86,7 @@ def operations_callback(ops: dict) -> None:
         try:
             liked_post_to_update = Post.get(Post.uri == record.subject.uri)
             Post.update(likes=Post.likes + 1).where(Post.uri == record.subject.uri).execute()
-            print(Post.get(Post.uri == record.subject.uri).likes)
+            #print(Post.get(Post.uri == record.subject.uri).likes)
             logger.info(f'Updated post likes (added): {record.subject.uri}')     
         except:
             next
@@ -95,7 +95,7 @@ def operations_callback(ops: dict) -> None:
     posts_to_unlike = [p['uri'] for p in ops['likes']['deleted']]
     if posts_to_unlike:
         Post.update(likes=Post.likes -1).where(Post.uri.in_(posts_to_delete))
-        print("removed like")
+        #print("removed like")
         #print(liked_post_removed)
         '''
         try:
