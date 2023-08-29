@@ -7,31 +7,35 @@ from datetime import datetime
 from atproto.xrpc_client.models import ids
 
 from atproto import Client, models
+import json
+
+with open('./server/secrets/secret.json') as file_object:
+        secrets = json.load(file_object)
 
 # YOUR bluesky handle
 # Ex: user.bsky.social
-HANDLE: str = ''
+HANDLE: str = secrets["Username"]
 
 # YOUR bluesky password, or preferably an App Password (found in your client settings)
 # Ex: abcd-1234-efgh-5678
-PASSWORD: str = ''
+PASSWORD: str = secrets["Password"]
 
 # The hostname of the server where feed server will be hosted
 # Ex: feed.bsky.dev
-HOSTNAME: str = ''
+HOSTNAME: str = 'feed.zelenyy.info'
 
 # A short name for the record that will show in urls
 # Lowercase with no spaces.
 # Ex: whats-hot
-RECORD_NAME: str = ''
+RECORD_NAME: str = 'FURRY-WS-FEED'
 
 # A display name for your feed
 # Ex: What's Hot
-DISPLAY_NAME: str = ''
+DISPLAY_NAME: str = 'Furry watersports posts'
 
 # (Optional) A description of your feed
 # Ex: Top trending content from the whole network
-DESCRIPTION: str = 'powered by The AT Protocol SDK for Python'
+DESCRIPTION: str = 'Top watersports content from furries. List of furries gathered from @furryli.st'
 
 # (Optional) The path to an image to be used as your feed's avatar
 # Ex: ./path/to/avatar.jpeg
@@ -74,7 +78,7 @@ def main():
     ))
 
     print('Successfully published!')
-    print('Feed URI (put in "WHATS_ALF_URI" env var):', response.uri)
+    print('Feed URI (put in "PISS_ALGO_URI" env var):', response.uri)
 
 
 if __name__ == '__main__':
