@@ -19,7 +19,7 @@ stream_thread = threading.Thread(
 )
 
 print("Generating Furry file...")
-#write_furry_file(get_furries())
+write_furry_file(get_furries())
 stream_thread.start()
 
 
