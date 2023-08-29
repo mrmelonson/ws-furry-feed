@@ -1,5 +1,5 @@
-from . import whats_alf
+from . import piss_algo
 
 algos = {
-    whats_alf.uri: whats_alf.handler
+    piss_algo.uri: piss_algo.handler
 }
