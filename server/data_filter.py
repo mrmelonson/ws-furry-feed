@@ -4,6 +4,8 @@ from server.logger import logger
 from server.database import db, Post
 import json
 
+from datetime import datetime, timedelta
+
 furfile =  open("./server/furries.txt", "r")
 furlist = furfile.read().split("\n")
 furfile.close()
@@ -25,9 +27,16 @@ def update_all_likes():
     posts = Post.select()
     for post in posts:
         likes_accurate = client.bsky.feed.get_likes({'uri' : post.uri})
-        reposts_accurate = len(client.bsky.feed.get_reposted_by({'uri' : post.uri, 'limit' :100})) #only gets a max of 100 reposts
+        #print(client.bsky.feed.get_reposted_by({'uri' : post.uri, 'limit' :100}).repostedBy)
+        reposts_accurate = len(client.bsky.feed.get_reposted_by({'uri' : post.uri, 'limit' :100}).repostedBy) #only gets a max of 100 reposts
         Post.update(likes=likes_accurate, reposts=reposts_accurate).where(Post.uri == post.uri)
 
+def remove_old_posts():
+    days_ago = 10
+    
+    cutoff_date = datetime.date(datetime.now()) - timedelta(days_ago)
+    Post.delete().where(Post.indexed_at < cutoff_date).execute()
+    print(cutoff_date)
 
 def operations_callback(ops: dict) -> None:
     # Here we can filter, process, run ML classification, etc.
@@ -67,8 +76,8 @@ def operations_callback(ops: dict) -> None:
                     'reposts' : 0
                 }
                 posts_to_create.append(post_dict)
-                update_all_likes()
-                
+                update_all_likes() #update likes when new post is created
+                remove_old_posts() #remove posts from 10 days ago from db
 
     posts_to_delete = [p['uri'] for p in ops['posts']['deleted']]
     if posts_to_delete:
