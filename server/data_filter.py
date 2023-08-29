@@ -25,7 +25,7 @@ def update_all_likes():
     posts = Post.select()
     for post in posts:
         likes_accurate = client.bsky.feed.get_likes({'uri' : post.uri})
-        reposts_accurate = len(client.bsky.feed.get_reposted_by({'uri' : post.uri, 'limit' :100}))
+        reposts_accurate = len(client.bsky.feed.get_reposted_by({'uri' : post.uri, 'limit' :100})) #only gets a max of 100 reposts
         Post.update(likes=likes_accurate, reposts=reposts_accurate).where(Post.uri == post.uri)
 
 
@@ -63,7 +63,6 @@ def operations_callback(ops: dict) -> None:
                     'reply_parent': reply_parent,
                     'reply_root': reply_root,
                     'likes' : 0,
-                    'views' : 0,
                     'image' : post_with_images,
                     'reposts' : 0
                 }
