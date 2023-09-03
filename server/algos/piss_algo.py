@@ -40,7 +40,7 @@ def handler(cursor: Optional[str], limit: int) -> dict:
         posts = posts.where(Post.indexed_at <= indexed_at).where(Post.cid < cid)
 
 
-    sorted_pissPost = sorted(pissPosts, key=lambda x: x['score'])
+    sorted_pissPost = sorted(pissPosts, key=lambda x: x['score'], reverse=True)
 
     feed = [{'post': pisspost['uri']} for pisspost in sorted_pissPost]
 
