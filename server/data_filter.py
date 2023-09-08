@@ -4,6 +4,8 @@ from server.logger import logger
 from server.database import db, Post
 import json
 
+import re
+
 from datetime import datetime, timedelta
 
 furfile =  open("./server/furries.txt", "r")
@@ -12,10 +14,12 @@ furfile.close()
 
 filterfile = open("./server/filter.txt", "r")
 filterlist = filterfile.read().split("\n")
+filterlist_combined = "(" + ")|(".join(filterlist) + ")"
 filterfile.close()
 
 blacklistfile = open("./server/blacklist.txt", "r")
 blacklist = blacklistfile.read().split("\n")
+blacklist_combined = "(" + ")|(".join(blacklist) + ")"
 blacklistfile.close()
 
 with open('./server/secrets/secret.json') as file_object:
@@ -53,7 +57,7 @@ def operations_callback(ops: dict) -> None:
         #print(furlist)
         # only furry posts
         if created_post["author"] in furlist:
-            if not any(map(record.text.lower().__contains__, blacklist)) and any(map(record.text.lower().__contains__, filterlist)):
+            if not re.search(blacklist_combined, record.text.lower()) and re.search(filterlist_combined, record.text.lower()):
                 post_with_images = isinstance(record.embed, models.AppBskyEmbedImages.Main)
                 inlined_text = record.text.replace('\n', ' ')
                 logger.info(f'New post (with images: {post_with_images}): {inlined_text}')

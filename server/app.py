@@ -10,7 +10,7 @@ from flask import Flask, jsonify, request
 from server.algos import algos
 from server.data_filter import operations_callback
 
-from server.get_furry import get_furries, write_furry_file
+from server.get_furry import get_furries, write_furry_file, validate_posts
 app = Flask(__name__)
 
 stream_stop_event = threading.Event()
@@ -20,6 +20,7 @@ stream_thread = threading.Thread(
 
 print("Generating Furry file...")
 write_furry_file(get_furries())
+#validate_posts()
 stream_thread.start()
 
 
