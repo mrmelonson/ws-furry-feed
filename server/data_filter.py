@@ -80,7 +80,7 @@ def operations_callback(ops: dict) -> None:
                     'reposts' : 0
                 }
                 posts_to_create.append(post_dict)
-                update_all_likes() #update likes when new post is created
+                #update_all_likes() #update likes when new post is created
                 remove_old_posts() #remove posts from 10 days ago from db
 
     posts_to_delete = [p['uri'] for p in ops['posts']['deleted']]
