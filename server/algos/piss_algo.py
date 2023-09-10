@@ -3,7 +3,7 @@ from typing import Optional
 from operator import itemgetter
 
 from server import config
-from server.database import Post
+from server.database import Post, Likes
 
 uri = config.PISS_ALGO_URI
 
@@ -21,11 +21,15 @@ def handler(cursor: Optional[str], limit: int) -> dict:
         pisspost = {}
         pisspost['uri'] = post.uri
         
+        likes = len(Likes.select().where(Likes.post_uri == post.uri))
+
         delta = datetime.date(datetime.now()) - datetime.date(post.indexed_at)
 
-        score = ((post.likes + 2*(post.reposts)) * (1 + 0.5 * int(post.image == True)) *  (1.5 - (0.5/7)*delta.days))
+        #score = ((post.likes + 2*(post.reposts)) * (1 + 0.5 * int(post.image == True)) *  (1.5 - (0.5/7)*delta.days))
 
-        #print(round(score, 2))
+        score = ((likes) * (1 + 0.5 * int(post.image == True)) *  (1.5 - (0.5/7)*delta.days))
+
+        print(round(score, 2))
 
         pisspost['score'] = round(score, 2)
         pissPosts.append(pisspost)

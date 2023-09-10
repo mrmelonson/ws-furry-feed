@@ -1,7 +1,7 @@
 from atproto import models
 from atproto import Client
 from server.logger import logger
-from server.database import db, Post
+from server.database import db, Post, Likes
 import json
 
 import re
@@ -49,13 +49,14 @@ def operations_callback(ops: dict) -> None:
 
     # for example, let's create our custom feed that will contain all posts that contains alf related text
 
+    # First check if there are posts to add
+    # Then check if it matched blacklists, if not then check for filter
+    # Create dict with relevent info
+    # Add a new record in Post DB
+
     posts_to_create = []
     for created_post in ops['posts']['created']:
         record = created_post['record']
-
-        # print all texts just as demo that data stream works
-        #print(furlist)
-        # only furry posts
         if created_post["author"] in furlist:
             if not re.search(blacklist_combined, record.text.lower()) and re.search(filterlist_combined, record.text.lower()):
                 post_with_images = isinstance(record.embed, models.AppBskyEmbedImages.Main)
@@ -75,53 +76,57 @@ def operations_callback(ops: dict) -> None:
                     'cid': created_post['cid'],
                     'reply_parent': reply_parent,
                     'reply_root': reply_root,
-                    'likes' : 0,
                     'image' : post_with_images,
-                    'reposts' : 0
+                    'reposts' : 0,
+                    'text' : inlined_text
                 }
-                posts_to_create.append(post_dict)
-                #update_all_likes() #update likes when new post is created
+                posts_to_create.append(post_dict) # add a post into db
                 remove_old_posts() #remove posts from 10 days ago from db
 
+    # Check if there are any posts to delete then get the uri of the post and delete it if it is in the db
+    #
     posts_to_delete = [p['uri'] for p in ops['posts']['deleted']]
     if posts_to_delete:
-        Post.delete().where(Post.uri.in_(posts_to_delete))
+        Post.delete().where(Post.uri.in_(posts_to_delete)).execute()
         #logger.info(f'Deleted from feed: {len(posts_to_delete)}')
 
+    # create new record if there has been a post that matches filter
     if posts_to_create:
         with db.atomic():
             for post_dict in posts_to_create:
                 Post.create(**post_dict)
         logger.info(f'Added to feed: {len(posts_to_create)}')
 
+    # If there is a like that matches a post_URI then add it to the likes table
+    likes_to_create = []
     for liked_post in ops['likes']['created']:
         record = liked_post['record']
         try:
-            liked_post_to_update = Post.get(Post.uri == record.subject.uri)
-            Post.update(likes=Post.likes + 1).where(Post.uri == record.subject.uri).execute()
-            #print(Post.get(Post.uri == record.subject.uri).likes)
-            logger.info(f'Updated post likes (added): {record.subject.uri}')     
+            if Post.get(Post.uri == record.subject.uri):
+                # when a post is liked, create in db
+                likes_dict = {
+                    'post_uri' : record.subject.uri,
+                    'like_uri' : liked_post['uri']
+                }
+                
+                likes_to_create.append(likes_dict)
+                logger.info(f'Updated post likes (added): ' + str(liked_post['uri']))     
         except:
             next
 
-    #figure out how to remove likes from posts
+    # formally add it to the db
+    if likes_to_create:
+        with db.atomic():
+            for like_dict in likes_to_create:
+                Likes.create(**like_dict)
+        logger.info(f'Added to feed: {len(posts_to_create)}')
+
+
+    # if there is a like deleted, check if it is in the likes table and delete if there is
     posts_to_unlike = [p['uri'] for p in ops['likes']['deleted']]
     if posts_to_unlike:
-        Post.update(likes=Post.likes -1).where(Post.uri.in_(posts_to_delete))
-        #print("removed like")
-        #print(liked_post_removed)
-        '''
-        try:
-            liked_post_removed_to_update = Post.get(Post.uri == record.subject.uri)
-            Post.update(likes=Post.likes - 1).where(Post.uri == record.subject.uri)
-            logger.info(f'Updated post likes (removed): {record.subject.uri}')     
-        except:
-            next
-        '''
-        #if liked_posts_to_update:
-        #    for uri in liked_posts_to_update:
-        #        Post.update(likes=Post.likes + 1).where(Post.uri == uri)
-         #       logger.info(f'Updated post likes: {uri}')     
+        Likes.delete().where(Likes.like_uri.in_(posts_to_unlike)).execute()
+
 
 
 

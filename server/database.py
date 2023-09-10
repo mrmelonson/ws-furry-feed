@@ -17,9 +17,18 @@ class Post(BaseModel):
     reply_parent = peewee.CharField(null=True, default=None)
     reply_root = peewee.CharField(null=True, default=None)
     indexed_at = peewee.DateTimeField(default=datetime.now)
-    likes = peewee.IntegerField()
     image = peewee.BooleanField()
-    reposts = peewee.BooleanField()
+    text = peewee.CharField()
+
+class Likes(BaseModel):
+    post_uri = peewee.CharField()
+    like_uri = peewee.CharField(index=True)
+    indexed_at = peewee.DateTimeField(default=datetime.now)
+
+class Replies(BaseModel):
+    post_uri = peewee.CharField()
+    repost_uri = peewee.CharField(index=True)
+    indexed_at = peewee.DateTimeField(default=datetime.now)
 
 class SubscriptionState(BaseModel):
     service = peewee.CharField(unique=True)
@@ -28,4 +37,4 @@ class SubscriptionState(BaseModel):
 
 if db.is_closed():
     db.connect()
-    db.create_tables([Post, SubscriptionState])
+    db.create_tables([Post, Likes, Replies, SubscriptionState])
