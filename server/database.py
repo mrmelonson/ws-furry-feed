@@ -17,6 +17,7 @@ class Post(BaseModel):
     reply_parent = peewee.CharField(null=True, default=None)
     reply_root = peewee.CharField(null=True, default=None)
     indexed_at = peewee.DateTimeField(default=datetime.now)
+    author_did = peewee.CharField()
     image = peewee.BooleanField()
     text = peewee.CharField()
 

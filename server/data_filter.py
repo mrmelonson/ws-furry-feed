@@ -57,6 +57,7 @@ def operations_callback(ops: dict) -> None:
     posts_to_create = []
     for created_post in ops['posts']['created']:
         record = created_post['record']
+
         if created_post["author"] in furlist:
             if not re.search(blacklist_combined, record.text.lower()) and re.search(filterlist_combined, record.text.lower()):
                 post_with_images = isinstance(record.embed, models.AppBskyEmbedImages.Main)
@@ -76,6 +77,7 @@ def operations_callback(ops: dict) -> None:
                     'cid': created_post['cid'],
                     'reply_parent': reply_parent,
                     'reply_root': reply_root,
+                    'author_did' : created_post["author"],
                     'image' : post_with_images,
                     'reposts' : 0,
                     'text' : inlined_text
