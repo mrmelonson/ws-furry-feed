@@ -49,14 +49,19 @@ def handler(cursor: Optional[str], limit: int) -> dict:
 
         score, cid = cursor_parts
         #indexed_at = datetime.fromtimestamp(int(indexed_at) / 1000)
-        sorted_pissPost = sorted_pissPost[:next((index for (index, d) in enumerate(sorted_pissPost) if d["cid"] == cid), None)]
+        cut = next((index for (index, d) in enumerate(sorted_pissPost) if d["cid"] == cid), None)
+        sorted_pissPost = sorted_pissPost[cut:]
         #print(sorted_pissPost)
 
+    for post in sorted_pissPost:
+        print(str(post['cid']) + " -- " + str(post['score']))
+
     sorted_pissPost = sorted_pissPost[:limit]
+    print(len(sorted_pissPost))
     feed = [{'post': pisspost['uri']} for pisspost in sorted_pissPost]
 
     cursor = None
-    last_post = sorted_pissPost[limit-1] if sorted_pissPost else None
+    last_post = sorted_pissPost[-1] if sorted_pissPost else None
     #print(last_post['indexed_at'].timestamp())
     if last_post:
         score = last_post['score']
