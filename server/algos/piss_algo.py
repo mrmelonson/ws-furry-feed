@@ -33,7 +33,7 @@ def handler(cursor: Optional[str], limit: int) -> dict:
 
         #print(round(score, 2))
 
-        print(post.text)
+        #print(post.text)
 
         pisspost['score'] = round(score, 2)
         pisspost['indexed_at'] = post.indexed_at
@@ -49,12 +49,12 @@ def handler(cursor: Optional[str], limit: int) -> dict:
 
         score, cid = cursor_parts
         #indexed_at = datetime.fromtimestamp(int(indexed_at) / 1000)
-        sorted_pissPost = sorted_pissPost[sorted_pissPost.keys().index(cid)]
-        print(sorted_pissPost)
+        sorted_pissPost = sorted_pissPost[:next((index for (index, d) in enumerate(sorted_pissPost) if d["cid"] == cid), None)]
+        #print(sorted_pissPost)
 
     sorted_pissPost = sorted_pissPost[:limit]
 
-    print(len(sorted_pissPost))
+    #print(len(sorted_pissPost))
 
     feed = [{'post': pisspost['uri']} for pisspost in sorted_pissPost]
 
