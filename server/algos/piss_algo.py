@@ -29,7 +29,9 @@ def handler(cursor: Optional[str], limit: int) -> dict:
 
         score = ((likes) * (1 + 0.5 * int(post.image == True)) *  (1.5 - (0.5/7)*delta.days))
 
-        print(round(score, 2))
+        #print(round(score, 2))
+
+        print(post.text)
 
         pisspost['score'] = round(score, 2)
         pissPosts.append(pisspost)
@@ -49,7 +51,7 @@ def handler(cursor: Optional[str], limit: int) -> dict:
     feed = [{'post': pisspost['uri']} for pisspost in sorted_pissPost]
 
     cursor = None
-    last_post = posts[-1] if posts else None
+    last_post = sorted_pissPost[-1] if posts else None
     if last_post:
         cursor = f'{int(last_post.indexed_at.timestamp() * 1000)}::{last_post.cid}'
 
