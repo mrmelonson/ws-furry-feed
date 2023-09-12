@@ -31,9 +31,11 @@ def handler(cursor: Optional[str], limit: int) -> dict:
 
         #print(round(score, 2))
 
-        print(post.text)
+        #print(post.text)
 
         pisspost['score'] = round(score, 2)
+        pisspost['indexed_at'] = post.indexed_at
+        pisspost['cid'] = post.cid
         pissPosts.append(pisspost)
 
     if cursor:
@@ -48,12 +50,17 @@ def handler(cursor: Optional[str], limit: int) -> dict:
 
     sorted_pissPost = sorted(pissPosts, key=lambda x: x['score'], reverse=True)
 
+    #print(sorted_pissPost)
+
     feed = [{'post': pisspost['uri']} for pisspost in sorted_pissPost]
 
     cursor = None
     last_post = sorted_pissPost[-1] if posts else None
+    #print(last_post['indexed_at'].timestamp())
     if last_post:
-        cursor = f'{int(last_post.indexed_at.timestamp() * 1000)}::{last_post.cid}'
+        stamp = last_post['indexed_at'].timestamp()
+        cid = pisspost['cid']
+        cursor = f'{int(stamp * 1000)}::{cid}'
 
     return {
         'cursor': cursor,
