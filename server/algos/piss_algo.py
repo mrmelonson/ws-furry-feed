@@ -53,11 +53,11 @@ def handler(cursor: Optional[str], limit: int) -> dict:
         sorted_pissPost = sorted_pissPost[cut:]
         #print(sorted_pissPost)
 
-    for post in sorted_pissPost:
-        print(str(post['cid']) + " -- " + str(post['score']))
+    #for post in sorted_pissPost:
+    #    print(str(post['cid']) + " -- " + str(post['score']))
 
     sorted_pissPost = sorted_pissPost[:limit]
-    print(len(sorted_pissPost))
+    #print(len(sorted_pissPost))
     feed = [{'post': pisspost['uri']} for pisspost in sorted_pissPost]
 
     cursor = None
