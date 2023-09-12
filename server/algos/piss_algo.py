@@ -15,8 +15,10 @@ def handler(cursor: Optional[str], limit: int) -> dict:
 
     pissPosts = []
 
-    posts = Post.select().order_by(Post.indexed_at.desc()).order_by(Post.cid.desc()).limit(limit)
-
+    #posts = Post.select().order_by(Post.indexed_at.desc()).order_by(Post.cid.desc()).limit(limit)
+    
+    posts = Post.select().order_by(Post.indexed_at.desc()).order_by(Post.cid.desc())
+    
     for post in posts:
         pisspost = {}
         pisspost['uri'] = post.uri
@@ -31,36 +33,38 @@ def handler(cursor: Optional[str], limit: int) -> dict:
 
         #print(round(score, 2))
 
-        #print(post.text)
+        print(post.text)
 
         pisspost['score'] = round(score, 2)
         pisspost['indexed_at'] = post.indexed_at
         pisspost['cid'] = post.cid
         pissPosts.append(pisspost)
 
+    sorted_pissPost = sorted(pissPosts, key=lambda x: x['score'], reverse=True)
+
     if cursor:
         cursor_parts = cursor.split('::')
         if len(cursor_parts) != 2:
             raise ValueError('Malformed cursor')
 
-        indexed_at, cid = cursor_parts
-        indexed_at = datetime.fromtimestamp(int(indexed_at) / 1000)
-        posts = posts.where(Post.indexed_at <= indexed_at).where(Post.cid < cid)
+        score, cid = cursor_parts
+        #indexed_at = datetime.fromtimestamp(int(indexed_at) / 1000)
+        sorted_pissPost = sorted_pissPost[sorted_pissPost.keys().index(cid)]
+        print(sorted_pissPost)
 
+    sorted_pissPost = sorted_pissPost[:limit]
 
-    sorted_pissPost = sorted(pissPosts, key=lambda x: x['score'], reverse=True)
-
-    #print(sorted_pissPost)
+    print(len(sorted_pissPost))
 
     feed = [{'post': pisspost['uri']} for pisspost in sorted_pissPost]
 
     cursor = None
-    last_post = sorted_pissPost[-1] if posts else None
+    last_post = sorted_pissPost[-1] if sorted_pissPost else None
     #print(last_post['indexed_at'].timestamp())
     if last_post:
-        stamp = last_post['indexed_at'].timestamp()
+        score = last_post['score']
         cid = pisspost['cid']
-        cursor = f'{int(stamp * 1000)}::{cid}'
+        cursor = f'{int(score)}::{cid}'
 
     return {
         'cursor': cursor,
