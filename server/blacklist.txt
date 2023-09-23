@@ -2,4 +2,5 @@
 \bdiaper\b
 \bscat\b
 \bpoop\b
-\bpadded\b
+\bpadd(ed|ing)\b
+\bbaby\b
