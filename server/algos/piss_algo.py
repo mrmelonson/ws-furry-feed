@@ -28,7 +28,7 @@ def handler(cursor: Optional[str], limit: int) -> dict:
         delta = datetime.date(datetime.now()) - datetime.date(post.indexed_at)
 
         #score = ((likes) * (1 + 0.5 * int(post.image == True)) *  (1.5 - (0.5/7)*delta.days))
-        score = ((likes) * (1 + 0.5 * int(post.image == True)) * (pow(2,(0.6-0.3*delta.days)))
+        score = ((likes) * (1 + 0.5 * int(post.image == True)) * (pow(2,(0.6-0.3*delta.days))))
 
 
         #print(round(score, 2))
